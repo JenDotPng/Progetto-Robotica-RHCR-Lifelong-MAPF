@@ -14,10 +14,11 @@ Toolkit custom per visualizzazione, confronto e reporting di esperimenti Lifelon
 9. [Script Principali](#script-principali)
 10. [Formato Dati Atteso](#formato-dati-atteso)
 11. [Output Generati](#output-generati)
-12. [Workflow Consigliati](#workflow-consigliati)
-13. [Troubleshooting](#troubleshooting)
-14. [Estensioni Future](#estensioni-future)
-15. [Licenza](#licenza)
+12. [Esempi Visivi](#esempi-visivi)
+13. [Workflow Consigliati](#workflow-consigliati)
+14. [Troubleshooting](#troubleshooting)
+15. [Estensioni Future](#estensioni-future)
+16. [Licenza](#licenza)
 
 ## Autori
 - Piangatelli Jennifer
@@ -206,6 +207,21 @@ A seconda dello script, vengono prodotti:
 - report HTML di confronto;
 - PNG dei grafici comparativi;
 - figure aggregate in cartelle dedicate.
+
+## Esempi Visivi
+Di seguito alcuni esempi PNG del visualizer (cartella `visualizer/examples/`):
+
+### Trails
+![Trails view](examples/experiment_trails.png)
+
+### Planned Paths
+![Planned paths view](examples/experiment_planned_paths.png)
+
+### Heatmap - Congestion
+![Congestion heatmap](examples/experiment_congestion.png)
+
+### Heatmap - Velocity
+![Velocity heatmap](examples/experiment_velocity.png)
 
 ## Workflow Consigliati
 ### Workflow A: Analisi visuale di una run
