@@ -1,0 +1,64 @@
+# --- Build Artifacts (CMake / compilazione) ---
+build/
+bin/
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles/
+*.ninja
+compile_commands.json
+
+# Build output multipiattaforma
+Debug/
+Release/
+x64/
+out/
+
+# --- Eseguibili / binari locali ---
+lifelong
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.obj
+*.o
+*.pdb
+
+# --- IDE / Editor ---
+.idea/
+.vscode/
+*.vcxproj*
+*.VC.db
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Python cache / test cache ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+visualizer/.pytest_cache/
+
+# --- Log e file temporanei ---
+~*
+*.swp
+*.tmp
+*.temp
+*.log
+
+# --- File grandi generati (per evitare blocchi push GitHub) ---
+# Esporta HTML/JSON/video solo nelle cartelle generate.
+visualizer/heatmap_results/
+visualizer/exports/
+exp/**/*.webm
+exp/**/*.mp4
+exp/**/experiment_data.json
+
+# --- Heuristics cache (rigenerabile) ---
+maps/*_heuristics_table.txt
+maps/*_rotation_heuristics_table.txt

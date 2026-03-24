@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizer - Experiment Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 2px solid #0f3460;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #0f3460;
+            padding: 15px 30px;
+            border-bottom: 2px solid #533483;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #e94560;
+            margin-bottom: 5px;
+        }
+
+        .header .exp-info {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0f3460;
+            position: relative;
+            overflow: auto;
+        }
+
+        canvas {
+            border: 2px solid #533483;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+            cursor: grab;
+            max-width: 100%;
+            max-height: 100%;
+            height: auto;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .controls {
+            background: #16213e;
+            padding: 20px;
+            border-top: 2px solid #0f3460;
+        }
+
+        .playback-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #ff4d6d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: #533483;
+        }
+
+        .btn.secondary:hover {
+            background: #6a4593;
+        }
+
+        .timeline {
+            flex: 1;
+            position: relative;
+        }
+
+        .timeline input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #e94560;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .timeline input[type="range"]::-moz-range-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #e94560;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+
+
+        .timeline-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speed-control label {
+            font-size: 14px;
+        }
+
+        .speed-control select {
+            background: #0f3460;
+            color: #eee;
+            border: 1px solid #533483;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            color: #e94560;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0f3460;
+        }
+
+        .metric {
+            background: #0f3460;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #e94560;
+        }
+
+        .metric label {
+            font-size: 12px;
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .metric value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .options {
+            margin-top: 20px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .option input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .option label {
+            font-size: 14px;
+        }
+
+        .agent-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .agent-item {
+            background: #0f3460;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .agent-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .agent-info {
+            flex: 1;
+            font-size: 12px;
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 1400px) {
+            .sidebar {
+                width: 250px;
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+            
+            .metric value {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: row;
+            }
+            
+            .sidebar {
+                width: 200px;
+                padding: 10px;
+            }
+            
+            .sidebar h2 {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+            
+            .metric {
+                padding: 8px;
+                margin-bottom: 8px;
+            }
+            
+            .metric label {
+                font-size: 11px;
+            }
+            
+            .metric value {
+                font-size: 16px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 150px;
+                overflow-x: auto;
+                padding: 8px;
+                border-right: none;
+                border-bottom: 2px solid #0f3460;
+            }
+            
+            .sidebar h2 {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .options {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 0;
+            }
+            
+            .option {
+                margin-bottom: 0;
+            }
+            
+            .agent-list {
+                display: none;
+            }
+            
+            .controls {
+                padding: 10px;
+            }
+            
+            .playback-controls {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .btn {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+            
+            .speed-control {
+                gap: 5px;
+            }
+            
+            .speed-control label {
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                max-height: 120px;
+                padding: 5px;
+            }
+            
+            .header {
+                padding: 10px 15px;
+            }
+            
+            .header h1 {
+                font-size: 16px;
+                margin-bottom: 3px;
+            }
+            
+            .header .exp-info {
+                font-size: 12px;
+            }
+            
+            .controls {
+                padding: 8px;
+            }
+            
+            .playback-controls {
+                gap: 5px;
+                margin-bottom: 8px;
+            }
+            
+            .btn {
+                padding: 4px 8px;
+                font-size: 10px;
+                min-width: 40px;
+            }
+            
+            .timeline {
+                min-width: 100px;
+            }
+            
+            .fps-counter {
+                font-size: 10px;
+                padding: 5px;
+            }
+            
+            .metric {
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+            
+            .metric value {
+                font-size: 14px;
+            }
+        }
+
+        .fps-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 52, 96, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(233, 69, 96, 0.3);
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .heatmap-legend {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(15, 52, 96, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .heatmap-legend h3 {
+            margin-bottom: 10px;
+            color: #e94560;
+        }
+
+        .legend-gradient {
+            width: 200px;
+            height: 20px;
+            background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Experiment Summary</h2>
+            <div class="metric">
+                <label title="MAPF solver used for this experiment run.">Solver</label>
+                <value id="solver">Unknown</value>
+            </div>
+            <div class="metric">
+                <label title="Number of agents in the simulation (k).">Agents (k)</label>
+                <value id="numAgents">0</value>
+            </div>
+            <div class="metric">
+                <label title="Planning horizon w: number of future steps considered by the solver.">Time Horizon (w)</label>
+                <value id="paramW">N/A</value>
+            </div>
+            <div class="metric">
+                <label title="Replanning period h: the solver is called every h timesteps.">Replanning Period (h)</label>
+                <value id="paramH">N/A</value>
+            </div>
+            <div class="metric">
+                <label title="Current timestep over the total simulation horizon.">Timestep</label>
+                <value id="timestepDisplay">0 / 0</value>
+            </div>
+            <div class="metric">
+                <label title="Average planning runtime in seconds.">Runtime (s)</label>
+                <value id="runtime">0.0</value>
+            </div>
+            <div class="metric">
+                <label title="Average number of tasks completed for each single timestep.">Throughput</label>
+                <value id="throughput">0</value>
+            </div>
+            <div class="metric">
+                <label title="Total detected conflicts (vertex + edge).">Conflicts</label>
+                <value id="conflicts">0</value>
+            </div>
+            <!--<div class="metric">
+                <label>Vertex Conflicts</label>
+                <value id="vertexConflicts">0</value>
+            </div>
+            <div class="metric">
+                <label>Edge Conflicts</label>
+                <value id="edgeConflicts">0</value>
+            </div>
+            <div class="metric">
+                <label title="Completion time of the slowest agent (last finishing timestep).">Makespan</label>
+                <value id="makespan">0</value>
+            </div>
+            <div class="metric">
+                <label title="Sum of all agent path durations. Lower is generally better.">Flowtime</label>
+                <value id="flowtime">0</value>
+            </div>-->
+            <div class="metric">
+                <label title="Map file used for this experiment run.">Map</label>
+                <value id="mapName">N/A</value>
+            </div>
+            <div class="metric">
+                <label title="Map dimensions in cells (width x height).">Grid Size</label>
+                <value id="gridSize">0 × 0</value>
+            </div>
+            <div class="metric">
+                <label title="Number of traversable cells (non-obstacle cells).">Free Cells</label>
+                <value id="freeCells">0</value>
+            </div>
+            <div class="metric">
+                <label title="Percentage of traversable cells over total grid cells.">Free Cell Density</label>
+                <value id="freeCellDensity">0%</value>
+            </div>
+            <div class="metric">
+                <label title="Number of blocked cells (obstacles).">Obstacles</label>
+                <value id="obstacles">0</value>
+            </div>
+            <div class="metric">
+                <label title="Percentage of obstacle cells over total grid cells.">Obstacle Density</label>
+                <value id="obstacleDensity">0%</value>
+            </div>
+            
+
+            <h2>Display Options</h2>
+            <div class="options">
+                <div class="option">
+                    <input type="checkbox" id="toggleTrails">
+                    <label for="toggleTrails" title="Show recent movement trails for each agent.">Show Agent Trails</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="togglePaths">
+                    <label for="togglePaths" title="Display future planned path segments.">Show Planned Paths</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="toggleAgentIDs" checked>
+                    <label for="toggleAgentIDs" title="Render numeric IDs on top of agents.">Show Agent IDs</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="toggleGrid" checked>
+                    <label for="toggleGrid" title="Toggle grid cell boundary lines.">Show Grid Lines</label>
+                </div>
+                <div class="option">
+                    <label for="heatmapSelect" title="Select the heatmap overlay to display on the map.">Heatmap</label>
+                    <select id="heatmapSelect">
+                        <option value="none" selected title="Disable heatmap overlay.">None</option>
+                        <option value="congestion" title="Show frequency of cell occupancy.">Congestion</option>
+                        <option value="conflicts" title="Show conflict concentration across the map.">Conflicts</option>
+                        <option value="velocity" title="Show relative movement intensity by area.">Velocity</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2>Agent List</h2>
+            <div class="agent-list" id="agent-list">
+                <!-- Agent items will be added dynamically -->
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <h1> VISUALIZER - Experiment Viewer</h1>
+                <div class="exp-info" id="exp-info">
+                    Loading experiment...
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+                <div class="fps-counter">
+                    FPS: <span id="fps">0</span>
+                </div>
+                <div class="heatmap-legend" id="heatmap-legend" style="display: none;">
+                    <h3>Congestion</h3>
+                    <div class="legend-gradient"></div>
+                    <div class="legend-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Loading experiment...</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="playback-controls">
+                    <button class="btn" id="playBtn">▶ Play</button>
+                    <button class="btn secondary" id="resetBtn">⟲ Reset</button>
+                    <button class="btn secondary" id="stepBackBtn">← Back</button>
+                    <button class="btn secondary" id="stepForwardBtn">→ Step</button>
+                    <div class="timeline">
+                        <input type="range" id="timeline" min="0" max="100" value="0">
+                        <div class="timeline-info">
+                            <span id="timeline-start">0:00</span>
+                            <span id="timeline-end">0:00</span>
+                        </div>
+                    </div>
+                    <div class="speed-control">
+                        <label>Speed:</label>
+                        <input type="range" id="speedSlider" min="0.25" max="4" step="0.25" value="1">
+                        <span id="speedValue">1.0x</span>
+                    </div>
+                    <button class="btn secondary" id="exportImageBtn">💾 Image</button>
+                    <button class="btn secondary" id="exportVideoBtn">🎥 Video</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/viewer.js"></script>
+    <script src="/static/js/ui.js"></script>
+    <script>
+        async function loadExperimentData() {
+            const initializeFromData = (data) => {
+                // Validate data structure
+                if (!data.config || !data.grid || !data.paths) {
+                    throw new Error('Invalid data structure: missing required fields');
+                }
+
+                // Store data globally
+                window.experimentData = data;
+
+                // Initialize viewer and UI
+                window.viewer = new ExperimentViewer('mainCanvas', data);
+                window.ui = new ViewerUI(window.viewer);
+
+                // Hide loading spinner
+                document.getElementById('loading').style.display = 'none';
+
+                // Display experiment info
+                const rawMapName = data.config.map || data.config.map_file || 'Unknown';
+                const mapName = String(rawMapName).split(/[/\\]/).pop() || 'Unknown';
+                const numAgents = data.paths.length;
+                const solver = data.config.solver || 'Unknown';
+                document.getElementById('exp-info').textContent = `${mapName} - ${numAgents} agents (${solver})`;
+            };
+
+            try {
+                const embeddedData = window.EXPERIMENT_DATA || window.experimentData;
+
+                if (embeddedData) {
+                    console.log('Using embedded experiment data (standalone mode).');
+                    initializeFromData(embeddedData);
+                    console.log('Experiment viewer loaded successfully');
+                    return;
+                }
+
+                console.log('Fetching experiment data from /api/data...');
+                const response = await fetch('/api/data');
+                
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Received experiment data:', data);
+                initializeFromData(data);
+                
+                console.log('Experiment viewer loaded successfully');
+            } catch (error) {
+                console.error('Failed to load experiment data:', error);
+                document.getElementById('exp-info').textContent = `Error: ${error.message}`;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        // Load experiment when page is ready
+        window.addEventListener('DOMContentLoaded', loadExperimentData);
+    </script>
+</body>
+</html>

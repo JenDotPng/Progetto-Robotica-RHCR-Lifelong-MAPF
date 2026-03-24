@@ -1,0 +1,12 @@
+map: maps/sorting_map
+#drives: 50
+seed: 3
+solver: WHCA
+time_limit: 120
+simulation_window: 8
+planning_window: 20
+simulation_time: 400
+robust: 0
+rotate: 0
+use_dummy_paths: 0
+hold_endpoints: 0

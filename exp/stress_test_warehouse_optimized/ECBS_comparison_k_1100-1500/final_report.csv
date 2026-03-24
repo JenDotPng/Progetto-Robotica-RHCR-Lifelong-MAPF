@@ -1,0 +1,6 @@
+Seed,Solver,Agenti,Runtime,Throughput,Status
+42,ECBS,1100,0.4083833333333333,17520,Success
+42,ECBS,1200,0.0,0,Timeout
+42,ECBS,1300,0.0,0,Timeout
+42,ECBS,1400,0.0,0,Timeout
+42,ECBS,1500,0.0,0,Timeout

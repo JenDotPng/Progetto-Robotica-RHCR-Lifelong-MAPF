@@ -1,0 +1,12 @@
+map: maps/warehouse_optimized
+#drives: 100
+seed: 42
+solver: WHCA
+time_limit: 240
+simulation_window: 25
+planning_window: 70
+simulation_time: 1500
+robust: 0
+rotate: 0
+use_dummy_paths: 0
+hold_endpoints: 0

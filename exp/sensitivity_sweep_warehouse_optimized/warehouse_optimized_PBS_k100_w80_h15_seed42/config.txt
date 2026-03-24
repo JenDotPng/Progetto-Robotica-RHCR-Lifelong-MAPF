@@ -1,0 +1,12 @@
+map: maps/warehouse_optimized
+#drives: 100
+seed: 42
+solver: PBS
+time_limit: 240
+simulation_window: 15
+planning_window: 80
+simulation_time: 1500
+robust: 0
+rotate: 0
+use_dummy_paths: 0
+hold_endpoints: 0

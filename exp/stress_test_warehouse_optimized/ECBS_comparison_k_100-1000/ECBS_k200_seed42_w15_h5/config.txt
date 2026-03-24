@@ -1,0 +1,12 @@
+map: exp/maps/warehouse_optimized
+#drives: 200
+seed: 42
+solver: ECBS
+time_limit: 240
+simulation_window: 5
+planning_window: 15
+simulation_time: 3000
+robust: 0
+rotate: 0
+use_dummy_paths: 0
+hold_endpoints: 0

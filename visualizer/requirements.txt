@@ -1,0 +1,6 @@
+# Core dependencies (minimal set for professional visualization)
+numpy>=1.21.0        # Numerical computations (heatmaps, metrics)
+matplotlib>=3.5.0    # Publication-quality plots (300 DPI PDF/PNG)
+pandas>=1.3.0        # Data analysis and comparison tables
+flask>=2.0.0         # Interactive web viewer
+

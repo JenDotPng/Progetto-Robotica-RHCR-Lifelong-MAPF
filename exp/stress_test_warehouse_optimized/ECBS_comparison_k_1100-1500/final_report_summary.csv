@@ -1,0 +1,6 @@
+Solver,Agenti,Runs,Success_Rate,Runtime_Mean,Runtime_Std,Throughput_Mean,Throughput_Std
+ECBS,1100,1,1.0,0.4083833333333333,0.0,17520.0,0.0
+ECBS,1200,1,0.0,0.0,0.0,0.0,0.0
+ECBS,1300,1,0.0,0.0,0.0,0.0,0.0
+ECBS,1400,1,0.0,0.0,0.0,0.0,0.0
+ECBS,1500,1,0.0,0.0,0.0,0.0,0.0
