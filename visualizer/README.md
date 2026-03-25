@@ -103,6 +103,26 @@ pip install -r requirements.txt
 python visualize_experiment.py "..\exp\<cartella_esperimento>"
 ```
 
+### Porta del viewer web
+- Porta di default: `5000`
+- Opzione CLI dedicata: `--port <numero_porta>`
+
+Esempi:
+```powershell
+# Avvio su porta di default (5000)
+python visualize_experiment.py "..\exp\<cartella_esperimento>"
+
+# Avvio su porta personalizzata (es. 8080)
+python visualize_experiment.py "..\exp\<cartella_esperimento>" --port 8080
+
+# Avvio su porta personalizzata senza apertura automatica del browser
+python visualize_experiment.py "..\exp\<cartella_esperimento>" --port 8080 --no-browser
+```
+
+URL atteso:
+- default: `http://localhost:5000`
+- custom: `http://localhost:<porta>`
+
 ### Export HTML standalone
 ```powershell
 python visualize_experiment.py "..\exp\<cartella_esperimento>" --export-html viewer.html
@@ -250,7 +270,8 @@ Di seguito alcuni esempi PNG del visualizer (cartella `visualizer/examples/`):
 - Verificare ambiente Python attivo e dipendenze installate.
 
 ### Porta occupata per viewer
-- Chiudere processi precedenti o usare una porta alternativa (se supportata dallo script).
+- Chiudere processi precedenti oppure rilanciare su una porta libera con `--port`.
+- Esempio: `python visualize_experiment.py "..\exp\<cartella_esperimento>" --port 8080`
 
 ### Report senza grafici
 - Controllare che [comparison_plots/](comparison_plots/) sia scrivibile.
@@ -269,6 +290,7 @@ Di seguito alcuni esempi PNG del visualizer (cartella `visualizer/examples/`):
 
 ## Estensioni Future
 - Dashboard web consolidata multi-run con filtri per solver, mappa, `k`, seed e finestre (`w`,`h`).
+- Evoluzione delle metriche da statiche a dinamiche: passaggio da indicatori solo geometrici della mappa (es. celle occupate/libere, ostacoli, percentuali) a statistiche dipendenti dall esperimento;
 - Metriche custom aggiuntive (es. smoothness, fairness, idle ratio) con confronto diretto tra run.
 - Supporto a dataset ampi con ottimizzazioni I/O, caching e caricamento progressivo.
 - Miglioramento usabilita export video (`--export-video`):

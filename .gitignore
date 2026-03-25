@@ -61,4 +61,4 @@ exp/**/experiment_data.json
 
 # --- Heuristics cache (rigenerabile) ---
 maps/*_heuristics_table.txt
-maps/*_rotation_heuristics_table.txt
+maps/*_rotation_heuristics_table.txtvisualizer/static/experiment_data.json

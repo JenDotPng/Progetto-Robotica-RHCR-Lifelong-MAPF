@@ -32,7 +32,7 @@ In contesti logistici realistici, la scelta di solver e parametri non puo essere
 
 ## Obiettivi del Progetto
 - Definire una metodologia riproducibile per il confronto tra solver MAPF in regime lifelong.
-- Analizzare il ruolo dei parametri RHCR (`planning_window`, `simulation_window`) in relazione alla mappa.
+- Analizzare il ruolo dei parametri RHCR (`w`, `h`) in relazione alla mappa.
 - Supportare l'identificazione di colli di bottiglia strutturali e zone critiche di conflitto.
 - Fornire strumenti software per analisi, visualizzazione e reporting tecnico-scientifico.
 
@@ -54,9 +54,7 @@ Le sezioni seguenti rappresentano contributi implementati ex novo in questo repo
 ### Script di orchestrazione campagne sperimentali
 - [final_stress_test.py](final_stress_test.py)
 - [warehouse_final_stress_test.py](warehouse_final_stress_test.py)
-- [sweep_sensitivity.py](sweep_sensitivity.py)
-
-Nota: nel testo progettuale il sensitivity sweep puo essere citato anche come `sensitivity_sweep.py`; nel repository il file effettivo e [sweep_sensitivity.py](sweep_sensitivity.py).
+- [sweep_sensitivity.py](sweep_sensitivity.py).
 
 ## Architettura Complessiva
 ### Core simulativo C++
@@ -101,22 +99,39 @@ Il workflow adottato nel repository segue una pipeline riproducibile in quattro 
 	- stress test con [final_stress_test.py](final_stress_test.py) e [warehouse_final_stress_test.py](warehouse_final_stress_test.py);
 	- sweep parametrico con [sweep_sensitivity.py](sweep_sensitivity.py).
 3. Analisi post-run:
-	- conflitti, metriche normalizzate e bottleneck con gli script in `analyzer_and_report/`.
+	- conflitti, metriche normalizzate e bottleneck con gli script in [analyzer_and_report/](analyzer_and_report/);
+	- guida completa (ordine consigliato, output attesi e troubleshooting) in [analyzer_and_report/README.md](analyzer_and_report/README.md).
 4. Reporting e visualizzazione:
 	- report tecnico in [docs/REPORT.md](docs/REPORT.md);
 	- analisi map-centric in [docs/MAPS_ANALYSIS.md](docs/MAPS_ANALYSIS.md), [docs/SORTING_MAP.md](docs/SORTING_MAP.md), [docs/WAREHOUSE_MAP.md](docs/WAREHOUSE_MAP.md);
-	- ispezione qualitativa run con toolkit web in [visualizer/](visualizer/).
+	- ispezione qualitativa run con toolkit web in [visualizer/](visualizer/) (dettagli in [visualizer/README.md](visualizer/README.md)).
 
-## Riproducibilita: Build ed Esecuzione
+## Riproducibilità: Build ed Esecuzione
 ### Requisiti
 - CMake >= 3.12
 - Compilatore C++11
 - Boost (`program_options`, `filesystem`)
-- Python 3.10+ con pacchetti di analisi/visualizzazione
+- Python 3.10+
+
+### Setup dipendenze Python
+Installare le dipendenze Python dalla root del repository:
+
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Nota:
+- `requirements.txt` (root) copre script di orchestrazione, analyzer e visualizer;
+- `visualizer/requirements.txt` rimane disponibile come set minimale solo per il modulo web.
+
+### Dipendenza C++ esterna: Boost
+Il codice richiede la libreria esterna BOOST (https://www.boost.org/).
+
 
 ### Build (Windows, MSVC)
 ```powershell
-cmake -S . -B build
+cmake -S . -B build -A x64
 cmake --build build --config Release
 ```
 
@@ -125,7 +140,7 @@ Eseguibile atteso:
 
 ### Build (Linux/macOS)
 ```bash
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
@@ -133,9 +148,76 @@ Eseguibile atteso:
 - `build/lifelong`
 
 ### Esecuzione rapida
+Windows (PowerShell):
+
+```powershell
+.\build\Release\lifelong.exe -m maps/sorting_map.grid -k 100 --scenario SORTING --simulation_window 5 --planning_window 10 --solver PBS --seed 0
+```
+
+Linux/macOS:
+
 ```bash
 ./build/lifelong -m maps/sorting_map.grid -k 100 --scenario SORTING --simulation_window 5 --planning_window 10 --solver PBS --seed 0
 ```
+
+Output minimo atteso nella cartella di output (`--output`, default `../exp/test`):
+- `solver.csv`
+- `tasks.txt`
+- `paths.txt`
+
+### Esecuzione pipeline sperimentale
+Esempi dalla root del repository:
+
+```bash
+# Stress test su sorting map
+python final_stress_test.py
+
+# Stress test su warehouse optimized
+python warehouse_final_stress_test.py
+
+# Sensitivity sweep (w, h)
+python sweep_sensitivity.py
+```
+
+Analisi e report (modulo dedicato):
+- riferimento principale: [analyzer_and_report/README.md](analyzer_and_report/README.md)
+- eseguire preferibilmente dalla cartella [analyzer_and_report/](analyzer_and_report/) per coerenza dei path relativi
+
+```bash
+cd analyzer_and_report
+
+# Analisi mappe come grafi
+python analyze_grid_graphs.py
+
+# Profilo conflitti/ripianificazioni
+python analyze_conflict_profile.py
+
+# Analisi bottleneck strutturale
+python analyze_bottleneck.py
+
+# Metriche normalizzate
+python analyze_normalized_metrics.py
+
+# Generazione grafici finali per report
+python generate_report_plots.py
+```
+
+Visualizer (modulo dedicato):
+- riferimento principale: [visualizer/README.md](visualizer/README.md)
+- eseguire preferibilmente dalla cartella [visualizer/](visualizer/) per coerenza dei path relativi
+
+```bash
+cd visualizer
+
+# Viewer interattivo su una run
+python visualize_experiment.py "..\exp\<cartella_esperimento>"
+
+```
+
+### Troubleshooting rapido
+- Errore Boost in configurazione CMake: verificare installazione locale e che `program_options` e `filesystem` siano disponibili.
+- Eseguibile non trovato: controllare che la build sia `Release` e che il path usato negli script sia coerente con il sistema operativo.
+- Errori Python su import: assicurarsi che `pip install -r requirements.txt` sia stato eseguito dalla root del repository.
 
 ## Struttura del Repository
 ```text
